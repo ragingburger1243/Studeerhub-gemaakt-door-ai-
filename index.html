@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StudeerHub — Jouw leerplatform</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,600;0,700;0,900;1,300;1,400&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:      #0c0c0e;
+  --bg2:     #131316;
+  --bg3:     #1a1a1f;
+  --bg4:     #222228;
+  --bg5:     #2a2a32;
+  --border:  rgba(255,255,255,0.06);
+  --border2: rgba(255,255,255,0.1);
+  --border3: rgba(255,255,255,0.16);
+  --text:    #ede9e0;
+  --text2:   #7c788a;
+  --text3:   #3e3c4a;
+  --nat:    #60c5ff;   /* natuurkunde — blue */
+  --nat-d:  rgba(96,197,255,0.08);
+  --nat-d2: rgba(96,197,255,0.15);
+  --wis:    #a3e635;   /* wiskunde — lime */
+  --wis-d:  rgba(163,230,53,0.08);
+  --sch:    #fb923c;   /* scheikunde — orange */
+  --sch-d:  rgba(251,146,60,0.08);
+  --bio:    #34d399;   /* biologie — green */
+  --bio-d:  rgba(52,211,153,0.08);
+  --geo:    #f472b6;   /* aardrijkskunde — pink */
+  --geo-d:  rgba(244,114,182,0.08);
+  --his:    #fbbf24;   /* geschiedenis — amber */
+  --his-d:  rgba(251,191,36,0.08);
+  --red:    #ff6b6b;
+  --red-d:  rgba(255,107,107,0.1);
+  --green:  #34d399;
+  --green-d:rgba(52,211,153,0.1);
+  --amber:  #fbbf24;
+  --amber-d:rgba(251,191,36,0.1);
+  --display:'Fraunces', serif;
+  --mono:'DM Mono', monospace;
+  --body:'Outfit', sans-serif;
+  --r: 14px;
+  --r-sm: 8px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--body);
+  font-size:14px;
+  line-height:1.6;
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* grain overlay */
+body::after{
+  content:'';
+  position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:9999;
+}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  position:fixed;left:0;top:0;bottom:0;width:220px;
+  background:var(--bg2);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  z-index:200;
+  transition:transform .3s cubic-bezier(.4,0,.2,1);
+}
+.sidebar-logo{
+  padding:22px 20px 16px;
+  border-bottom:1px solid var(--border);
+}
+.logo-text{
+  font-family:var(--display);
+  font-size:20px;
+  font-weight:700;
+  color:var(--text);
+  letter-spacing:-.02em;
+  font-style:italic;
+}
+.logo-text span{color:var(--nat);}
+.logo-sub{font-size:10px;color:var(--text3);font-family:var(--mono);letter-spacing:.08em;text-transform:uppercase;margin-top:2px;}
+
+.sidebar-section{padding:16px 12px 8px;font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:.12em;text-transform:uppercase;}
+
+.subject-btn{
+  display:flex;align-items:center;gap:10px;
+  width:calc(100% - 16px);margin:0 8px 2px;
+  padding:9px 12px;
+  border-radius:var(--r-sm);
+  border:none;background:transparent;
+  color:var(--text2);font-family:var(--body);font-size:13px;font-weight:400;
+  cursor:pointer;text-align:left;
+  transition:all .15s;
+  position:relative;
+}
+.subject-btn:hover{background:var(--bg3);color:var(--text);}
+.subject-btn.active{background:var(--nat-d2);color:var(--nat);}
+.subject-btn .sdot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.subject-btn .slock{margin-left:auto;font-size:10px;opacity:.4;}
+.subject-btn .sbadge{
+  margin-left:auto;font-family:var(--mono);font-size:9px;
+  padding:1px 6px;border-radius:3px;
+  background:var(--nat-d2);color:var(--nat);
+}
+
+.sidebar-bottom{margin-top:auto;padding:16px 12px;border-top:1px solid var(--border);}
+.progress-label{font-size:11px;color:var(--text2);margin-bottom:8px;display:flex;justify-content:space-between;}
+.progress-bar{height:4px;background:var(--bg4);border-radius:2px;overflow:hidden;}
+.progress-fill{height:100%;background:var(--nat);border-radius:2px;transition:width .4s;}
+
+/* ── MAIN ── */
+.main{margin-left:220px;min-height:100vh;display:flex;flex-direction:column;align-items:center;}
+
+/* ── TOPBAR ── */
+.topbar{
+  position:sticky;top:0;z-index:100;
+  background:rgba(12,12,14,0.88);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+  padding:0 32px;
+  height:52px;
+  width:100%;
+  display:flex;align-items:center;
+}
+.topbar-inner{width:100%;max-width:860px;margin:0 auto;display:flex;align-items:center;gap:16px;}
+.topbar-title{font-family:var(--display);font-size:15px;font-weight:600;color:var(--text);font-style:italic;}
+.topbar-tabs{display:flex;gap:2px;margin-left:auto;}
+.tab-btn{
+  padding:5px 14px;font-size:12px;font-family:var(--body);font-weight:500;
+  border-radius:20px;border:1px solid transparent;
+  background:transparent;color:var(--text2);cursor:pointer;transition:all .2s;
+}
+.tab-btn:hover{color:var(--text);}
+.tab-btn.active{background:var(--nat-d2);color:var(--nat);border-color:rgba(96,197,255,.2);}
+
+/* ── PAGES ── */
+.page{display:none;padding:32px 32px 64px;max-width:860px;margin:0 auto;width:100%;}
+.page.active{display:block;}
+
+/* ── DASHBOARD ── */
+.dash-hero{margin-bottom:36px;}
+.dash-eyebrow{font-family:var(--mono);font-size:10px;color:var(--nat);letter-spacing:.14em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.dash-eyebrow::before{content:'';width:20px;height:1px;background:var(--nat);}
+.dash-title{font-family:var(--display);font-size:38px;font-weight:700;color:var(--text);line-height:1.05;letter-spacing:-.02em;margin-bottom:8px;}
+.dash-title em{color:var(--nat);font-style:italic;}
+.dash-sub{font-size:14px;color:var(--text2);max-width:480px;}
+
+.subjects-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:28px;}
+.subj-card{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--r);padding:18px;
+  cursor:pointer;transition:all .2s;
+  position:relative;overflow:hidden;
+}
+.subj-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:var(--c, var(--nat));
+  transform:scaleX(0);transform-origin:left;transition:transform .25s;
+}
+.subj-card:hover{border-color:var(--border2);transform:translateY(-2px);}
+.subj-card:hover::before{transform:scaleX(1);}
+.subj-card.unlocked:hover{border-color:var(--c,var(--nat));}
+.subj-card.locked{opacity:.45;cursor:not-allowed;}
+.subj-card.locked:hover{transform:none;}
+.sc-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;font-size:18px;}
+.sc-name{font-family:var(--display);font-size:15px;font-weight:600;color:var(--text);margin-bottom:3px;font-style:italic;}
+.sc-desc{font-size:11px;color:var(--text2);margin-bottom:10px;}
+.sc-prog{display:flex;align-items:center;gap:8px;}
+.sc-bar{flex:1;height:3px;background:var(--bg4);border-radius:2px;overflow:hidden;}
+.sc-fill{height:100%;border-radius:2px;transition:width .4s;}
+.sc-pct{font-family:var(--mono);font-size:10px;color:var(--text3);}
+.sc-lock{font-size:11px;color:var(--text3);display:flex;align-items:center;gap:4px;}
+
+.recent-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:20px;}
+.rc-title{font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.rc-title::after{content:'';flex:1;height:1px;background:var(--border);}
+.rc-item{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--border);}
+.rc-item:last-child{border-bottom:none;}
+.rc-dot{width:8px;height:8px;border-radius:50%;}
+.rc-info{flex:1;}
+.rc-label{font-size:13px;color:var(--text);font-weight:500;}
+.rc-sub{font-size:11px;color:var(--text2);}
+.rc-score{font-family:var(--mono);font-size:12px;}
+.rc-score.good{color:var(--green);}
+.rc-score.mid{color:var(--amber);}
+
+/* ── CONTENT PAGES ── */
+.page-hero{margin-bottom:28px;}
+.page-eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+.page-eyebrow::before{content:'';width:16px;height:1px;}
+.page-title{font-family:var(--display);font-size:30px;font-weight:700;letter-spacing:-.02em;line-height:1.1;margin-bottom:6px;font-style:italic;}
+.page-sub{font-size:13px;color:var(--text2);}
+
+/* theory */
+.theory-block{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--r);padding:22px 24px;margin-bottom:14px;
+  position:relative;overflow:hidden;
+}
+.theory-block::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;
+  width:3px;border-radius:3px 0 0 3px;
+}
+.theory-block.blue::before{background:var(--nat);}
+.theory-block.lime::before{background:var(--wis);}
+.theory-block.orange::before{background:var(--sch);}
+.th-head{font-family:var(--display);font-size:15px;font-weight:600;color:var(--text);margin-bottom:10px;font-style:italic;display:flex;align-items:center;gap:8px;}
+.th-tag{font-family:var(--mono);font-size:9px;padding:2px 7px;border-radius:3px;font-style:normal;}
+.th-p{color:var(--text2);font-size:13px;line-height:1.75;margin-bottom:8px;}
+.th-p:last-child{margin-bottom:0;}
+.th-p b{color:var(--text);font-weight:500;}
+.formula{
+  background:var(--bg3);border:1px solid var(--border2);
+  border-radius:var(--r-sm);padding:11px 16px;
+  font-family:var(--mono);font-size:13px;font-weight:500;
+  margin:10px 0;letter-spacing:.02em;
+}
+.tag-strip{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;}
+.tag{font-family:var(--mono);font-size:9px;font-weight:500;padding:3px 8px;border-radius:3px;}
+
+/* widget cards */
+.wcard{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:20px 22px;margin-bottom:14px;transition:border-color .2s;}
+.wcard:hover{border-color:var(--border2);}
+.wcard-label{font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:.12em;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.wcard-label::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* controls */
+.ctrl{display:flex;align-items:center;gap:10px;margin:8px 0;}
+.ctrl label{min-width:120px;font-size:12px;color:var(--text2);}
+.ctrl input[type=range]{flex:1;height:3px;accent-color:var(--nat);-webkit-appearance:none;background:var(--bg4);border-radius:2px;cursor:pointer;}
+.ctrl input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:var(--nat);cursor:pointer;border:2px solid var(--bg);}
+.ctrl .val{min-width:50px;text-align:right;font-family:var(--mono);font-size:11px;color:var(--text);}
+.btn-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
+.mbtn{padding:5px 12px;font-size:11px;font-family:var(--mono);font-weight:500;border-radius:5px;border:1px solid var(--border2);background:var(--bg3);color:var(--text2);cursor:pointer;transition:all .15s;}
+.mbtn:hover{color:var(--text);border-color:var(--border3);}
+.mbtn.active{background:var(--nat-d2);border-color:rgba(96,197,255,.25);color:var(--nat);}
+canvas{width:100%;border-radius:var(--r-sm);display:block;background:var(--bg3);}
+.insight{border-radius:var(--r-sm);padding:10px 14px;font-size:12px;line-height:1.6;margin-top:10px;}
+.ins-ok{background:rgba(52,211,153,.08);color:#34d399;border:1px solid rgba(52,211,153,.15);}
+.ins-info{background:rgba(96,197,255,.08);color:#60c5ff;border:1px solid rgba(96,197,255,.15);}
+.ins-warn{background:rgba(251,191,36,.08);color:#fbbf24;border:1px solid rgba(251,191,36,.15);}
+.ins-err{background:rgba(255,107,107,.08);color:#ff6b6b;border:1px solid rgba(255,107,107,.15);}
+.legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:8px;font-size:11px;color:var(--text2);}
+.li{display:flex;align-items:center;gap:5px;}
+.ll{width:14px;height:3px;border-radius:2px;}
+.planet-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:12px 0;}
+.pcard{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px;}
+.pn{font-family:var(--mono);font-size:10px;font-weight:500;margin-bottom:2px;}
+.pg{font-size:10px;color:var(--text3);margin-bottom:6px;}
+.pfz{font-family:var(--mono);font-size:16px;font-weight:500;margin-bottom:5px;}
+.bar-t{height:4px;background:var(--bg4);border-radius:2px;overflow:hidden;}
+.bar-f{height:100%;border-radius:2px;transition:width .35s;}
+.rpills{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px;}
+.rpill{background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:6px 12px;font-family:var(--mono);font-size:10px;color:var(--text2);}
+.rpill.hi{background:rgba(52,211,153,.08);border-color:rgba(52,211,153,.15);color:var(--green);}
+.fbd-row{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;}
+.ftog{padding:4px 10px;font-size:10px;font-family:var(--mono);border-radius:4px;border:1px solid var(--border2);background:var(--bg3);color:var(--text3);cursor:pointer;display:flex;align-items:center;gap:4px;transition:all .15s;}
+.ftog .fd{width:6px;height:6px;border-radius:50%;}
+.ftog.on{color:var(--text);}
+
+/* quiz */
+.quiz-tabs{display:flex;gap:5px;margin-bottom:16px;}
+.qtab{padding:6px 16px;font-size:11px;font-family:var(--mono);font-weight:500;border-radius:16px;border:1px solid var(--border2);background:var(--bg3);color:var(--text2);cursor:pointer;transition:all .15s;letter-spacing:.04em;}
+.qtab:hover{color:var(--text);}
+.qtab.active{background:var(--nat-d2);color:var(--nat);border-color:rgba(96,197,255,.2);}
+.score-panel{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;}
+.score-big{font-family:var(--display);font-size:36px;font-weight:700;color:var(--text);line-height:1;font-style:italic;}
+.score-big span{color:var(--nat);}
+.prog-dots{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:5px;}
+.pd{width:8px;height:8px;border-radius:50%;background:var(--bg4);border:1px solid var(--border2);transition:all .2s;}
+.pd.ok{background:var(--green);border-color:var(--green);}
+.pd.err{background:var(--red);border-color:var(--red);}
+.score-msg{font-size:12px;color:var(--text2);}
+.reset-btn{margin-left:auto;padding:6px 14px;font-size:10px;font-family:var(--mono);font-weight:500;letter-spacing:.06em;border-radius:5px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;transition:all .15s;}
+.reset-btn:hover{color:var(--nat);border-color:rgba(96,197,255,.3);}
+.qcard{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:18px 20px;margin-bottom:10px;transition:border-color .2s;}
+.qcard:hover{border-color:var(--border2);}
+.qmeta{font-family:var(--mono);font-size:9px;color:var(--text3);margin-bottom:8px;letter-spacing:.08em;text-transform:uppercase;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.qtag{font-size:8px;padding:2px 6px;border-radius:3px;font-weight:500;}
+.qtext{font-size:14px;color:var(--text);margin-bottom:12px;line-height:1.65;}
+.qsub{font-size:11px;color:var(--text2);background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:7px 11px;margin-bottom:11px;font-family:var(--mono);}
+.opts{display:flex;flex-direction:column;gap:6px;}
+.opt{text-align:left;padding:9px 14px;font-size:13px;font-family:var(--body);border-radius:var(--r-sm);border:1px solid var(--border);background:var(--bg3);color:var(--text2);cursor:pointer;transition:all .12s;line-height:1.4;}
+.opt:hover:not(:disabled){border-color:var(--border3);color:var(--text);background:var(--bg4);}
+.opt.correct{background:rgba(52,211,153,.08);color:var(--green);border-color:rgba(52,211,153,.2);}
+.opt.wrong{background:rgba(255,107,107,.08);color:var(--red);border-color:rgba(255,107,107,.2);}
+.opt.reveal{background:rgba(52,211,153,.08);color:var(--green);border-color:rgba(52,211,153,.2);opacity:.55;}
+.feedback{font-size:12px;margin-top:9px;padding:9px 13px;border-radius:var(--r-sm);display:none;line-height:1.6;}
+.feedback.show{display:block;}
+.fb-ok{background:rgba(52,211,153,.08);color:var(--green);border:1px solid rgba(52,211,153,.12);}
+.fb-err{background:rgba(255,107,107,.08);color:var(--red);border:1px solid rgba(255,107,107,.12);}
+
+/* coming soon */
+.coming-soon{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-height:70vh;text-align:center;gap:16px;
+}
+.cs-icon{font-size:48px;opacity:.3;}
+.cs-title{font-family:var(--display);font-size:28px;font-weight:600;color:var(--text2);font-style:italic;}
+.cs-sub{font-size:13px;color:var(--text3);max-width:320px;}
+.cs-tag{font-family:var(--mono);font-size:10px;padding:4px 12px;border-radius:4px;letter-spacing:.08em;}
+
+/* resource cards */
+.res-card{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--r);padding:20px 22px;
+  display:flex;align-items:flex-start;gap:16px;
+  transition:all .2s;cursor:pointer;text-decoration:none;
+  position:relative;overflow:hidden;
+}
+.res-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:var(--rc,#ff4444);transform:scaleX(0);transform-origin:left;transition:transform .25s;
+}
+.res-card:hover{border-color:var(--border2);transform:translateY(-2px);}
+.res-card:hover::before{transform:scaleX(1);}
+.res-thumb{
+  width:64px;height:64px;border-radius:10px;flex-shrink:0;
+  background:var(--bg3);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-size:28px;overflow:hidden;
+}
+.res-thumb img{width:100%;height:100%;object-fit:cover;border-radius:9px;}
+.res-info{flex:1;min-width:0;}
+.res-label{font-family:var(--mono);font-size:9px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px;}
+.res-name{font-family:var(--display);font-size:17px;font-weight:600;color:var(--text);font-style:italic;margin-bottom:5px;line-height:1.2;}
+.res-desc{font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:10px;}
+.res-tags{display:flex;gap:5px;flex-wrap:wrap;}
+.res-tag{font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:3px;}
+.res-link{
+  display:inline-flex;align-items:center;gap:5px;
+  margin-top:12px;padding:6px 14px;
+  font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.06em;
+  border-radius:5px;border:1px solid var(--border2);
+  background:transparent;color:var(--text2);cursor:pointer;
+  text-decoration:none;transition:all .15s;
+}
+.res-link:hover{color:var(--text);border-color:var(--border3);}
+.res-link svg{width:12px;height:12px;flex-shrink:0;}
+
+/* scrollbar */
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--bg5);border-radius:3px;}
+
+@media(max-width:700px){
+  .sidebar{transform:translateX(-100%);}
+  .main{margin-left:0;align-items:stretch;}
+  .subjects-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
+  .planet-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
+  .topbar{padding:0 16px;}
+  .topbar-inner{max-width:100%;}
+  .page{padding:24px 16px 60px;}
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+.page.active>*{animation:fadeUp .3s ease both;}
+.page.active>*:nth-child(2){animation-delay:.05s;}
+.page.active>*:nth-child(3){animation-delay:.1s;}
+.page.active>*:nth-child(4){animation-delay:.15s;}
+.page.active>*:nth-child(5){animation-delay:.2s;}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-text">Studeer<span>Hub</span></div>
+    <div class="logo-sub">3e klas — 2024/25</div>
+  </div>
+
+  <div class="sidebar-section">Vakken</div>
+
+  <button class="subject-btn active" style="--c:var(--nat)" onclick="openSubject('nat',this)" id="sbtn-nat">
+    <span class="sdot" style="background:var(--nat)"></span>
+    Natuurkunde
+    <span class="sbadge">H4</span>
+  </button>
+  <button class="subject-btn" style="--c:var(--wis)" onclick="openSubject('wis',this)" id="sbtn-wis">
+    <span class="sdot" style="background:var(--wis)"></span>
+    Wiskunde
+    <span class="slock">🔒</span>
+  </button>
+  <button class="subject-btn" style="--c:var(--sch)" onclick="openSubject('sch',this)" id="sbtn-sch">
+    <span class="sdot" style="background:var(--sch)"></span>
+    Scheikunde
+    <span class="slock">🔒</span>
+  </button>
+  <button class="subject-btn" style="--c:var(--bio)" onclick="openSubject('bio',this)" id="sbtn-bio">
+    <span class="sdot" style="background:var(--bio)"></span>
+    Biologie
+    <span class="slock">🔒</span>
+  </button>
+  <button class="subject-btn" style="--c:var(--geo)" onclick="openSubject('geo',this)" id="sbtn-geo">
+    <span class="sdot" style="background:var(--geo)"></span>
+    Aardrijkskunde
+    <span class="slock">🔒</span>
+  </button>
+  <button class="subject-btn" style="--c:var(--his)" onclick="openSubject('his',this)" id="sbtn-his">
+    <span class="sdot" style="background:var(--his)"></span>
+    Geschiedenis
+    <span class="slock">🔒</span>
+  </button>
+
+  <div style="height:1px;background:var(--border);margin:12px 8px;"></div>
+  <button class="subject-btn" onclick="openSubject('dash',document.getElementById('sbtn-nat'))">
+    <span class="sdot" style="background:var(--text3)"></span>
+    Dashboard
+  </button>
+
+  <div class="sidebar-section">Extra</div>
+  <button class="subject-btn" id="sbtn-yt" onclick="openExtra('yt',this)">
+    <span class="sdot" style="background:#ff4444"></span>
+    YouTube
+  </button>
+  <button class="subject-btn" id="sbtn-web" onclick="openExtra('web',this)">
+    <span class="sdot" style="background:#a78bfa"></span>
+    Websites
+  </button>
+
+  <div class="sidebar-bottom">
+    <div class="progress-label">
+      <span>Voortgang H4</span>
+      <span style="font-family:var(--mono);font-size:10px;color:var(--nat)" id="prog-pct">0%</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-inner">
+      <span class="topbar-title" id="topbar-title">Natuurkunde — H4 Krachten</span>
+      <div class="topbar-tabs" id="topbar-tabs">
+        <button class="tab-btn active" onclick="showTab('theorie',this)">Theorie</button>
+        <button class="tab-btn" onclick="showTab('widgets',this)">Widgets</button>
+        <button class="tab-btn" onclick="showTab('quiz',this)">Toets</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ DASHBOARD ═══ -->
+  <div class="page" id="pg-dash">
+    <div class="dash-hero">
+      <div class="dash-eyebrow">Overzicht</div>
+      <h1 class="dash-title">Welkom terug,<br><em>wat ga je leren?</em></h1>
+      <p class="dash-sub">Kies een vak in de sidebar of klik hieronder om direct te beginnen.</p>
+    </div>
+
+    <div class="subjects-grid">
+      <div class="subj-card unlocked" style="--c:var(--nat)" onclick="openSubject('nat',document.getElementById('sbtn-nat'))">
+        <div class="sc-icon" style="background:rgba(96,197,255,.1)">⚡</div>
+        <div class="sc-name">Natuurkunde</div>
+        <div class="sc-desc">H4 — Krachten & evenwicht</div>
+        <div class="sc-prog">
+          <div class="sc-bar"><div class="sc-fill" style="background:var(--nat);width:0%" id="dash-nat-bar"></div></div>
+          <div class="sc-pct" id="dash-nat-pct">0%</div>
+        </div>
+      </div>
+      <div class="subj-card locked" style="--c:var(--wis)">
+        <div class="sc-icon" style="background:rgba(163,230,53,.1)">∑</div>
+        <div class="sc-name">Wiskunde</div>
+        <div class="sc-desc">Stof nog niet toegevoegd</div>
+        <div class="sc-lock">🔒 Binnenkort</div>
+      </div>
+      <div class="subj-card locked" style="--c:var(--sch)">
+        <div class="sc-icon" style="background:rgba(251,146,60,.1)">⚗</div>
+        <div class="sc-name">Scheikunde</div>
+        <div class="sc-desc">Stof nog niet toegevoegd</div>
+        <div class="sc-lock">🔒 Binnenkort</div>
+      </div>
+      <div class="subj-card locked" style="--c:var(--bio)">
+        <div class="sc-icon" style="background:rgba(52,211,153,.1)">🧬</div>
+        <div class="sc-name">Biologie</div>
+        <div class="sc-desc">Stof nog niet toegevoegd</div>
+        <div class="sc-lock">🔒 Binnenkort</div>
+      </div>
+      <div class="subj-card locked" style="--c:var(--geo)">
+        <div class="sc-icon" style="background:rgba(244,114,182,.1)">🌍</div>
+        <div class="sc-name">Aardrijkskunde</div>
+        <div class="sc-desc">Stof nog niet toegevoegd</div>
+        <div class="sc-lock">🔒 Binnenkort</div>
+      </div>
+      <div class="subj-card locked" style="--c:var(--his)">
+        <div class="sc-icon" style="background:rgba(251,191,36,.1)">📜</div>
+        <div class="sc-name">Geschiedenis</div>
+        <div class="sc-desc">Stof nog niet toegevoegd</div>
+        <div class="sc-lock">🔒 Binnenkort</div>
+      </div>
+    </div>
+
+    <div class="recent-card">
+      <div class="rc-title">Recente activiteit</div>
+      <div class="rc-item">
+        <div class="rc-dot" style="background:var(--nat)"></div>
+        <div class="rc-info"><div class="rc-label">Oefentoets — Basis</div><div class="rc-sub">Natuurkunde H4 · §4.1 & §4.2</div></div>
+        <div class="rc-score good">8/10</div>
+      </div>
+      <div class="rc-item">
+        <div class="rc-dot" style="background:var(--nat)"></div>
+        <div class="rc-info"><div class="rc-label">Herhaling — Normaalkracht</div><div class="rc-sub">Natuurkunde H4 · §4.2</div></div>
+        <div class="rc-score mid">6/9</div>
+      </div>
+      <div class="rc-item">
+        <div class="rc-dot" style="background:var(--nat)"></div>
+        <div class="rc-info"><div class="rc-label">Theorie gelezen</div><div class="rc-sub">Natuurkunde H4 · §4.3 massa & gewicht</div></div>
+        <div class="rc-score" style="color:var(--text2)">✓</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ THEORIE ═══ -->
+  <div class="page active" id="pg-theorie">
+    <div class="page-hero">
+      <div class="page-eyebrow" style="color:var(--nat)"><span style="display:block;width:16px;height:1px;background:var(--nat)"></span>§4.1 — §4.3</div>
+      <h1 class="page-title" style="color:var(--text)">Krachten & <em style="color:var(--nat)">Evenwicht</em></h1>
+      <p class="page-sub">Samenvatting van alle stof uit hoofdstuk 4.</p>
+    </div>
+
+    <div class="theory-block blue">
+      <div class="th-head"><span>§4.1 — Wat kan een kracht doen?</span><span class="th-tag" style="background:rgba(96,197,255,.12);color:var(--nat)">4.1</span></div>
+      <p class="th-p">Een kracht kan drie dingen: de <b>snelheid veranderen</b>, de <b>vorm veranderen</b>, of de <b>werking van een andere kracht opheffen</b>.</p>
+      <p class="th-p">Snelheidsverandering omvat: sneller worden, langzamer worden of van richting veranderen. Er is altijd een kracht nodig voor een snelheidsverandering — en andersom.</p>
+      <div class="formula" style="color:var(--nat)">een kracht kan → snelheidsverandering / vormverandering / opheffing</div>
+      <p class="th-p"><b>Kracht is een vectorgrootheid</b> — het heeft grootte (in N) én richting. Een kracht heeft ook een <b>aangrijpingspunt</b>: hoe hoger je een kast duwt, hoe effectiever hij kantelt.</p>
+      <div class="tag-strip">
+        <span class="tag" style="background:rgba(96,197,255,.12);color:var(--nat)">Vector: grootte + richting</span>
+        <span class="tag" style="background:rgba(96,197,255,.12);color:var(--nat)">Aangrijpingspunt telt mee</span>
+      </div>
+    </div>
+
+    <div class="theory-block lime">
+      <div class="th-head"><span>§4.2 — Resulterende kracht & evenwicht</span><span class="th-tag" style="background:rgba(163,230,53,.12);color:var(--wis)">4.2</span></div>
+      <p class="th-p">De <b>resulterende kracht</b> (F<sub>res</sub>) is de nettokracht op een voorwerp. Krachten in dezelfde richting tel je op; tegengestelde trek je af.</p>
+      <div class="formula" style="color:var(--wis)">F<sub>res</sub> = 0 N  →  stilstand of constante snelheid (krachtenevenwicht)<br>F<sub>res</sub> ≠ 0 N  →  versnelling in richting van F<sub>res</sub></div>
+      <p class="th-p"><b>Bewegen heeft geen kracht nodig</b> — alleen versnellen wel. De normaalkracht (F<sub>n</sub>) is de kracht van een ondersteunend oppervlak, loodrecht erop.</p>
+      <p class="th-p">Een <b>reactiekracht</b> past zich altijd aan de omstandigheden aan. F<sub>tafel op boek</sub> en F<sub>boek op tafel</sub> zijn even groot maar werken op <em>verschillende</em> voorwerpen — ze heffen elkaar dus niet op.</p>
+      <div class="formula" style="color:var(--wis)">F<sub>tafel op boek</sub> = F<sub>z</sub> (+ F<sub>hand</sub> als hand omlaag)<br>F<sub>tafel op boek</sub> = F<sub>z</sub> − F<sub>touw</sub> (als touw omhoog)</div>
+    </div>
+
+    <div class="theory-block orange">
+      <div class="th-head"><span>§4.3 — Massa, zwaartekracht & gewicht</span><span class="th-tag" style="background:rgba(251,146,60,.12);color:var(--sch)">4.3</span></div>
+      <p class="th-p"><b>Massa</b> is een maat voor weerstand tegen snelheidsverandering. Massa verandert nooit — op aarde, maan of in de ruimte.</p>
+      <div class="formula" style="color:var(--sch)">F<sub>z</sub> = 9,81 × m  |  eenheid 9,81 : N/kg  |  maan: g = 1,62 N/kg</div>
+      <p class="th-p"><b>Gewicht</b> is de kracht die een voorwerp uitoefent op een ondersteunend vlak of touw. Tijdens vrije val drukt het voorwerp nergens op → gewicht = 0 N, ook al werkt F<sub>z</sub> nog steeds.</p>
+      <p class="th-p">Een weegschaal meet gewicht en deelt door 9,81. Op de maan geeft diezelfde weegschaal een verkeerde massa-aanduiding.</p>
+      <div class="tag-strip">
+        <span class="tag" style="background:rgba(96,197,255,.12);color:var(--nat)">Massa: altijd constant</span>
+        <span class="tag" style="background:rgba(251,191,36,.12);color:var(--amber)">Fz: afhankelijk van planeet</span>
+        <span class="tag" style="background:rgba(52,211,153,.12);color:var(--green)">Gewicht: 0 N bij vrije val</span>
+        <span class="tag" style="background:rgba(255,107,107,.12);color:var(--red)">Fres=0: krachtenevenwicht</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ WIDGETS ═══ -->
+  <div class="page" id="pg-widgets">
+    <div class="page-hero">
+      <div class="page-eyebrow" style="color:var(--nat)"><span style="display:block;width:16px;height:1px;background:var(--nat)"></span>Interactief</div>
+      <h1 class="page-title" style="color:var(--text)">Speel met de <em style="color:var(--nat)">krachten</em></h1>
+    </div>
+
+    <!-- W1 -->
+    <div class="wcard">
+      <div class="wcard-label">Resulterende kracht</div>
+      <div class="ctrl"><label>Kracht links (N)</label><input type="range" id="w-fl" min="0" max="80" value="30" step="1" oninput="wRes()"><span class="val" id="w-fl-v">30 N</span></div>
+      <div class="ctrl"><label>Kracht rechts (N)</label><input type="range" id="w-fr" min="0" max="80" value="50" step="1" oninput="wRes()"><span class="val" id="w-fr-v">50 N</span></div>
+      <canvas id="cv-res" height="80" style="margin-top:10px"></canvas>
+      <div class="insight" id="res-ins"></div>
+    </div>
+
+    <!-- W2 -->
+    <div class="wcard">
+      <div class="wcard-label">Reactiekrachten — boek op tafel</div>
+      <div class="btn-row">
+        <button class="mbtn active" id="rb-basis" onclick="setRK('basis')">Alleen boek</button>
+        <button class="mbtn" id="rb-hand" onclick="setRK('hand')">Hand omlaag</button>
+        <button class="mbtn" id="rb-touw" onclick="setRK('touw')">Touw omhoog</button>
+        <button class="mbtn" id="rb-valt" onclick="setRK('valt')">Boek valt</button>
+      </div>
+      <div class="ctrl"><label>Massa boek</label><input type="range" id="rk-m" min="500" max="3000" value="1000" step="100" oninput="drawRK()"><span class="val" id="rk-m-v">1,0 kg</span></div>
+      <div class="ctrl" id="rk-xrow" style="display:none"><label id="rk-xlbl">Extra (N)</label><input type="range" id="rk-x" min="0" max="20" value="8" step="1" oninput="drawRK()"><span class="val" id="rk-x-v">8 N</span></div>
+      <canvas id="cv-rk" height="270" style="margin-top:10px"></canvas>
+      <div class="legend">
+        <div class="li"><div class="ll" style="background:#ff6b6b"></div>Fz</div>
+        <div class="li"><div class="ll" style="background:#34d399"></div>Ftafel op boek</div>
+        <div class="li"><div class="ll" style="background:#60c5ff"></div>Fboek op tafel</div>
+        <div class="li"><div class="ll" style="background:#fbbf24"></div>Extra kracht</div>
+      </div>
+      <div class="insight" id="rk-ins"></div>
+    </div>
+
+    <!-- W3 -->
+    <div class="wcard">
+      <div class="wcard-label">Fz = 9,81 × m — planeten</div>
+      <div class="ctrl"><label>Massa (kg)</label><input type="range" id="pl-m" min="1" max="200" value="60" step="1" oninput="drawPlanets()"><span class="val" id="pl-m-v">60 kg</span></div>
+      <div class="planet-grid" id="pgrid"></div>
+      <div class="insight ins-info" id="pl-ins"></div>
+    </div>
+
+    <!-- W4 -->
+    <div class="wcard">
+      <div class="wcard-label">Vectoroptelling</div>
+      <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;margin-bottom:10px">
+        <div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--nat);margin-bottom:6px;font-weight:500;letter-spacing:.08em">F1 — BLAUW</div>
+          <div class="ctrl"><label>Grootte</label><input type="range" id="v1m" min="10" max="100" value="60" step="1" oninput="drawVec()"><span class="val" id="v1m-v">60 N</span></div>
+          <div class="ctrl"><label>Richting °</label><input type="range" id="v1a" min="0" max="359" value="30" step="1" oninput="drawVec()"><span class="val" id="v1a-v">30°</span></div>
+        </div>
+        <div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--red);margin-bottom:6px;font-weight:500;letter-spacing:.08em">F2 — ROOD</div>
+          <div class="ctrl"><label>Grootte</label><input type="range" id="v2m" min="10" max="100" value="40" step="1" oninput="drawVec()"><span class="val" id="v2m-v">40 N</span></div>
+          <div class="ctrl"><label>Richting °</label><input type="range" id="v2a" min="0" max="359" value="120" step="1" oninput="drawVec()"><span class="val" id="v2a-v">120°</span></div>
+        </div>
+      </div>
+      <canvas id="cv-vec" height="260"></canvas>
+      <div class="rpills" id="vec-res"></div>
+    </div>
+
+    <!-- W5 -->
+    <div class="wcard">
+      <div class="wcard-label">Vrij-lichaamdiagram bouwer</div>
+      <div class="fbd-row" id="fbd-btns"></div>
+      <canvas id="cv-fbd" height="270"></canvas>
+      <div style="margin-top:10px" id="fbd-sliders"></div>
+      <div class="insight" id="fbd-ins"></div>
+    </div>
+  </div>
+
+  <!-- ═══ QUIZ ═══ -->
+  <div class="page" id="pg-quiz">
+    <div class="page-hero">
+      <div class="page-eyebrow" style="color:var(--nat)"><span style="display:block;width:16px;height:1px;background:var(--nat)"></span>Oefentoets</div>
+      <h1 class="page-title" style="color:var(--text)">Test je <em style="color:var(--nat)">kennis</em></h1>
+    </div>
+    <div class="quiz-tabs">
+      <button class="qtab active" id="qt-easy" onclick="setQuiz('easy')">Basis</button>
+      <button class="qtab" id="qt-hard" onclick="setQuiz('hard')">Moeilijk</button>
+      <button class="qtab" id="qt-rep" onclick="setQuiz('rep')">Herhaling</button>
+    </div>
+    <div class="score-panel">
+      <div class="score-big"><span id="q-ok">0</span>/<span id="q-tot">0</span></div>
+      <div style="flex:1;min-width:140px"><div class="prog-dots" id="q-prog"></div><div class="score-msg" id="q-msg">Beantwoord de vragen.</div></div>
+      <button class="reset-btn" onclick="resetQ()">↺ OPNIEUW</button>
+    </div>
+    <div id="q-container"></div>
+  </div>
+
+  <!-- ═══ COMING SOON ═══ -->
+  <div class="page" id="pg-coming">
+    <div class="coming-soon">
+      <div class="cs-icon">🔒</div>
+      <div class="cs-title" id="cs-name">Wiskunde</div>
+      <p class="cs-sub">De stof voor dit vak is nog niet toegevoegd. Stuur me de hoofdstukken en ik voeg ze toe!</p>
+      <span class="cs-tag" id="cs-color">Binnenkort beschikbaar</span>
+    </div>
+  </div>
+
+  <!-- ═══ YOUTUBE ═══ -->
+  <div class="page" id="pg-yt">
+    <div class="page-hero">
+      <div class="page-eyebrow" style="color:#ff4444"><span style="display:block;width:16px;height:1px;background:#ff4444"></span>Video</div>
+      <h1 class="page-title" style="color:var(--text)">YouTube <em style="color:#ff4444">kanalen</em></h1>
+      <p class="page-sub">Handige kanalen voor bij het studeren.</p>
+    </div>
+    <div id="yt-grid" style="display:grid;gap:14px;"></div>
+  </div>
+
+  <!-- ═══ WEBSITES ═══ -->
+  <div class="page" id="pg-web">
+    <div class="page-hero">
+      <div class="page-eyebrow" style="color:#a78bfa"><span style="display:block;width:16px;height:1px;background:#a78bfa"></span>Online</div>
+      <h1 class="page-title" style="color:var(--text)">Handige <em style="color:#a78bfa">websites</em></h1>
+      <p class="page-sub">Externe sites om mee te leren en oefenen.</p>
+    </div>
+    <div id="web-grid" style="display:grid;gap:14px;"></div>
+  </div>
+
+</div><!-- /main -->
+
+<script>
+/* ══ NAVIGATION ══ */
+let currentSubject = 'nat';
+
+function openSubject(subj, btn) {
+  document.querySelectorAll('.subject-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentSubject = subj;
+
+  if (subj === 'nat') {
+    document.getElementById('topbar-title').textContent = 'Natuurkunde — H4 Krachten';
+    document.getElementById('topbar-tabs').style.display = 'flex';
+    showTab('theorie', document.querySelector('.tab-btn'));
+  } else if (subj === 'dash') {
+    document.getElementById('topbar-title').textContent = 'Dashboard';
+    document.getElementById('topbar-tabs').style.display = 'none';
+    showPageDirect('dash');
+  } else {
+    const names = {wis:'Wiskunde',sch:'Scheikunde',bio:'Biologie',geo:'Aardrijkskunde',his:'Geschiedenis'};
+    const colors = {wis:'var(--wis)',sch:'var(--sch)',bio:'var(--bio)',geo:'var(--geo)',his:'var(--his)'};
+    document.getElementById('topbar-title').textContent = names[subj];
+    document.getElementById('topbar-tabs').style.display = 'none';
+    document.getElementById('cs-name').textContent = names[subj];
+    document.getElementById('cs-color').style.cssText = `background:rgba(96,197,255,.08);color:${colors[subj]};`;
+    showPageDirect('coming');
+  }
+}
+
+function showPageDirect(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('pg-'+id).classList.add('active');
+}
+
+function showTab(tab, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('pg-'+tab).classList.add('active');
+  if (tab === 'widgets') setTimeout(() => { wRes(); drawRK(); drawPlanets(); drawVec(); buildFBD(); drawFBD(); }, 50);
+  if (tab === 'quiz') buildQuiz();
+}
+
+/* ══ CANVAS HELPERS ══ */
+function setupCanvas(id, dh) {
+  const cv = document.getElementById(id);
+  const dW = cv.clientWidth || cv.offsetWidth || 680;
+  const dpr = window.devicePixelRatio || 1;
+  cv.width = dW * dpr; cv.height = dh * dpr;
+  const ctx = cv.getContext('2d'); ctx.scale(dpr, dpr);
+  return { ctx, W: dW, H: dh };
+}
+function arrow(ctx, x1,y1,x2,y2,col,lw,dash) {
+  if (Math.hypot(x2-x1,y2-y1) < 3) return;
+  ctx.save();
+  ctx.strokeStyle=col; ctx.fillStyle=col; ctx.lineWidth=lw;
+  if (dash) ctx.setLineDash(dash); else ctx.setLineDash([]);
+  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+  ctx.setLineDash([]);
+  const a = Math.atan2(y2-y1,x2-x1);
+  ctx.beginPath(); ctx.moveTo(x2,y2);
+  ctx.lineTo(x2-10*Math.cos(a-.38),y2-10*Math.sin(a-.38));
+  ctx.lineTo(x2-10*Math.cos(a+.38),y2-10*Math.sin(a+.38));
+  ctx.closePath(); ctx.fill(); ctx.restore();
+}
+function rrect(ctx,x,y,w,h,r,fill,stroke,lw) {
+  ctx.beginPath();
+  ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y); ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h-r); ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  ctx.lineTo(x+r,y+h); ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+  ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y);
+  ctx.closePath();
+  if(fill){ctx.fillStyle=fill;ctx.fill();}
+  if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=lw||1;ctx.stroke();}
+}
+function txt(ctx,t,x,y,col,font,align) {
+  ctx.fillStyle=col; ctx.font=font||'12px Outfit'; ctx.textAlign=align||'center'; ctx.fillText(t,x,y);
+}
+
+/* ══ W1: RESULTERENDE KRACHT ══ */
+function wRes() {
+  const fl=+document.getElementById('w-fl').value, fr=+document.getElementById('w-fr').value;
+  document.getElementById('w-fl-v').textContent=fl+' N';
+  document.getElementById('w-fr-v').textContent=fr+' N';
+  const {ctx,W,H}=setupCanvas('cv-res',80);
+  ctx.fillStyle='#1a1a1f'; ctx.fillRect(0,0,W,H);
+  const cx=W/2,cy=H/2,mL=W*.32,mN=80;
+  rrect(ctx,cx-50,cy-19,100,36,6,'#202028','#2e2e3a',1);
+  txt(ctx,'voorwerp',cx,cy+5,'#4a4858','500 12px Outfit');
+  if(fl>0) arrow(ctx,cx-54,cy,cx-54-(fl/mN)*mL,cy,'#ff6b6b',2.5);
+  if(fr>0) arrow(ctx,cx+54,cy,cx+54+(fr/mN)*mL,cy,'#60c5ff',2.5);
+  if(fl>0) txt(ctx,fl+' N',cx-54-(fl/mN)*mL/2,cy-12,'#ff6b6b','bold 10px DM Mono');
+  if(fr>0) txt(ctx,fr+' N',cx+54+(fr/mN)*mL/2,cy-12,'#60c5ff','bold 10px DM Mono');
+  const net=fr-fl, ins=document.getElementById('res-ins');
+  if(net===0){ins.className='insight ins-ok';ins.textContent='Fres = 0 N — krachtenevenwicht! Stilstand of constante snelheid.';}
+  else if(net>0){ins.className='insight ins-info';ins.innerHTML='Fres = '+net+' N → rechts. Het voorwerp <b>versnelt naar rechts</b>.';}
+  else{ins.className='insight ins-warn';ins.innerHTML='Fres = '+Math.abs(net)+' N ← links. Het voorwerp <b>versnelt naar links</b>.';}
+}
+
+/* ══ W2: REACTIEKRACHTEN ══ */
+let rkM='basis';
+function setRK(m){
+  rkM=m;
+  ['basis','hand','touw','valt'].forEach(x=>document.getElementById('rb-'+x).classList.toggle('active',x===m));
+  document.getElementById('rk-xrow').style.display=(m==='hand'||m==='touw')?'':'none';
+  if(m==='hand') document.getElementById('rk-xlbl').textContent='Duwkracht hand';
+  if(m==='touw') document.getElementById('rk-xlbl').textContent='Trekkracht touw';
+  drawRK();
+}
+function drawRK(){
+  const mass=+document.getElementById('rk-m').value/1000, ex=+document.getElementById('rk-x').value;
+  document.getElementById('rk-m-v').textContent=mass.toFixed(1).replace('.',',')+' kg';
+  document.getElementById('rk-x-v').textContent=ex+' N';
+  const fz=Math.round(mass*9.81*10)/10;
+  let fn=fz,ft=fz;
+  if(rkM==='hand'){fn=fz+ex;ft=fn;}
+  else if(rkM==='touw'){fn=Math.max(0,fz-ex);ft=fn;}
+  else if(rkM==='valt'){fn=0;ft=0;}
+  const {ctx,W,H}=setupCanvas('cv-rk',270);
+  ctx.fillStyle='#1a1a1f'; ctx.fillRect(0,0,W,H);
+  const cx=W/2,tY=195,bY=152,bW=140,bH=36;
+  rrect(ctx,cx-90,tY,180,11,3,'#23232c','#2e2e3a',1);
+  txt(ctx,'tafel',cx,tY+25,'#3e3c4a','10px DM Mono');
+  const sc=Math.min(48/Math.max(fz,.1),5);
+  const fzL=Math.max(8,fz*sc),fnL=fn>0?Math.max(8,fn*sc):0,ftL=ft>0?Math.max(8,ft*sc):0;
+  if(rkM!=='valt'){
+    rrect(ctx,cx-bW/2,bY,bW,bH,7,'#0a1d36','#60c5ff',1.5);
+    txt(ctx,'boek ('+mass.toFixed(1).replace('.',',')+' kg)',cx,bY+bH/2+5,'#7eb5f0','500 12px Outfit');
+    arrow(ctx,cx-18,bY,cx-18,bY-fzL,'#ff6b6b',2.5);
+    txt(ctx,'Fz='+fz.toFixed(1).replace('.',',')+'N',cx-26,bY-fzL/2,'#ff6b6b','bold 9px DM Mono','right');
+    if(fn>0){arrow(ctx,cx+18,tY,cx+18,tY-fnL-11,'#34d399',2.5);txt(ctx,'Fn='+fn.toFixed(1).replace('.',',')+'N',cx+26,tY-fnL/2-5,'#34d399','bold 9px DM Mono','left');}
+    if(ft>0){arrow(ctx,cx,tY+2,cx,tY+ftL+2,'#60c5ff',2.5);txt(ctx,'Fboek='+ft.toFixed(1).replace('.',',')+'N',cx,tY+ftL+17,'#60c5ff','bold 9px DM Mono');}
+    if(rkM==='hand'&&ex>0){
+      rrect(ctx,cx-30,bY-42,60,24,5,'#1a1008','#fbbf24',1);
+      txt(ctx,'hand',cx,bY-26,'#fbbf24','500 10px Outfit');
+      arrow(ctx,cx-44,bY-30,cx-44,bY,'#fbbf24',2.5);
+      txt(ctx,ex+'N',cx-50,bY-16,'#fbbf24','bold 9px DM Mono','right');
+    }
+    if(rkM==='touw'&&ex>0){
+      ctx.setLineDash([5,4]);ctx.strokeStyle='#fbbf24';ctx.lineWidth=1.5;
+      ctx.beginPath();ctx.moveTo(cx,16);ctx.lineTo(cx,bY);ctx.stroke();ctx.setLineDash([]);
+      arrow(ctx,cx,bY+2,cx,16,'#fbbf24',0);
+      txt(ctx,'Ftouw='+ex+'N',cx+8,32,'#fbbf24','bold 9px DM Mono','left');
+    }
+  } else {
+    rrect(ctx,cx-bW/2,bY+56,bW,bH,7,'#0a1d36','#60c5ff',1.5);
+    txt(ctx,'boek — valt!',cx,bY+79,'#7eb5f0','500 12px Outfit');
+    arrow(ctx,cx,bY+92,cx,bY+155,'#ff6b6b',3);
+    txt(ctx,'Fz='+fz.toFixed(1).replace('.',',')+'N',cx+55,bY+128,'#ff6b6b','bold 9px DM Mono');
+    txt(ctx,'Fn = 0 N | Fboek op tafel = 0 N',cx,tY+24,'#3e3c4a','9px DM Mono');
+  }
+  const ins=document.getElementById('rk-ins');
+  const fS=fz.toFixed(1).replace('.',','),nS=fn.toFixed(1).replace('.',',');
+  if(rkM==='basis'){ins.className='insight ins-ok';ins.innerHTML='Op boek: Fn ('+nS+' N↑) = Fz ('+fS+' N↓) → evenwicht. Fboek op tafel = reactiekracht.';}
+  else if(rkM==='hand'){ins.className='insight ins-warn';ins.innerHTML='Fz + Fhand = '+fS+' + '+ex+' = <b>'+nS+' N</b>. Tafel past zich aan.';}
+  else if(rkM==='touw'){ins.className='insight ins-info';ins.innerHTML='Touw helpt '+ex+' N mee. Fn = '+fS+' − '+ex+' = <b>'+nS+' N</b>.';}
+  else{ins.className='insight ins-err';ins.textContent='Geen contact. Fn = 0 N. Fz werkt nog wél — boek versnelt omlaag.';}
+}
+
+/* ══ W3: PLANETEN ══ */
+const PLANETS=[
+  {n:'Aarde',g:9.81,c:'#60c5ff'},{n:'Maan',g:1.62,c:'#7c788a'},
+  {n:'Mars',g:3.72,c:'#ff6b6b'},{n:'Jupiter',g:24.79,c:'#fbbf24'},
+  {n:'Venus',g:8.87,c:'#34d399'},{n:'Ruimte',g:0,c:'#b89bff'}
+];
+function drawPlanets(){
+  const m=+document.getElementById('pl-m').value;
+  document.getElementById('pl-m-v').textContent=m+' kg';
+  const max=m*24.79;
+  document.getElementById('pgrid').innerHTML=PLANETS.map(p=>{
+    const fz=Math.round(m*p.g*10)/10;
+    const pct=max>0?Math.round(fz/max*100):0;
+    return`<div class="pcard"><div class="pn" style="color:${p.c}">${p.n}</div><div class="pg">g=${p.g} N/kg</div><div class="pfz" style="color:${p.c}">${fz.toFixed(1).replace('.',',')} N</div><div class="bar-t"><div class="bar-f" style="width:${pct}%;background:${p.c}"></div></div></div>`;
+  }).join('');
+  const fA=Math.round(m*9.81*10)/10,fM=Math.round(m*1.62*10)/10;
+  document.getElementById('pl-ins').innerHTML='Aarde: <b>'+fA.toFixed(1).replace('.',',')+' N</b>. Maan: <b>'+fM.toFixed(1).replace('.',',')+' N</b>. Massa blijft altijd '+m+' kg!';
+}
+
+/* ══ W4: VECTOROPTELLING ══ */
+function drawVec(){
+  const f1m=+document.getElementById('v1m').value,f1a=+document.getElementById('v1a').value;
+  const f2m=+document.getElementById('v2m').value,f2a=+document.getElementById('v2a').value;
+  document.getElementById('v1m-v').textContent=f1m+' N';document.getElementById('v1a-v').textContent=f1a+'°';
+  document.getElementById('v2m-v').textContent=f2m+' N';document.getElementById('v2a-v').textContent=f2a+'°';
+  const {ctx,W,H}=setupCanvas('cv-vec',260);
+  ctx.fillStyle='#1a1a1f'; ctx.fillRect(0,0,W,H);
+  const cx=W/2,cy=H/2,sc=1.4;
+  function toXY(mag,deg){const r=(deg-90)*Math.PI/180;return{x:Math.sin(r)*mag*sc,y:-Math.cos(r)*mag*sc};}
+  const v1=toXY(f1m,f1a),v2=toXY(f2m,f2a);
+  const vr={x:v1.x+v2.x,y:v1.y+v2.y};
+  const rm=Math.round(Math.sqrt(vr.x*vr.x+vr.y*vr.y)/sc*10)/10;
+  const ra=Math.round((Math.atan2(vr.x,-vr.y)*180/Math.PI+360)%360);
+  ctx.strokeStyle='#252530';ctx.lineWidth=0.5;
+  for(let x=0;x<W;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=0;y<H;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+  ctx.strokeStyle='#2e2e3a';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(cx,0);ctx.lineTo(cx,H);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(0,cy);ctx.lineTo(W,cy);ctx.stroke();
+  txt(ctx,'N',cx+6,14,'#3e3c4a','9px DM Mono','left');
+  txt(ctx,'Z',cx+6,H-6,'#3e3c4a','9px DM Mono','left');
+  txt(ctx,'O',W-6,cy-6,'#3e3c4a','9px DM Mono','right');
+  txt(ctx,'W',6,cy-6,'#3e3c4a','9px DM Mono','left');
+  arrow(ctx,cx,cy,cx+v1.x,cy+v1.y,'#60c5ff',3);
+  arrow(ctx,cx+v1.x,cy+v1.y,cx+v1.x+v2.x,cy+v1.y+v2.y,'#ff6b6b',2.5,[6,3]);
+  arrow(ctx,cx,cy,cx+vr.x,cy+vr.y,'#34d399',3.5);
+  txt(ctx,'F1='+f1m+'N',cx+v1.x+(v1.x>=0?26:-26),cy+v1.y+(v1.y<=0?-10:18),'#60c5ff','bold 10px DM Mono');
+  txt(ctx,'F2='+f2m+'N',cx+v1.x+v2.x/2+(v2.x>=0?24:-24),cy+v1.y+v2.y/2,'#ff6b6b','bold 10px DM Mono');
+  txt(ctx,'Fres='+rm.toFixed(1).replace('.',',')+'N',cx+vr.x+(vr.x>=0?32:-32),cy+vr.y+(vr.y<=0?-12:20),'#34d399','bold 10px DM Mono');
+  document.getElementById('vec-res').innerHTML=
+    `<div class="rpill">F1: ${f1m} N, ${f1a}°</div>
+     <div class="rpill">F2: ${f2m} N, ${f2a}°</div>
+     <div class="rpill hi">Fres: ${rm.toFixed(1).replace('.',',')} N, ${ra}°</div>`;
+}
+
+/* ══ W5: VRIJ-LICHAAMDIAGRAM ══ */
+const FLIST=[
+  {id:'fz',lbl:'Fz',dir:[0,1],col:'#ff6b6b',def:50,min:5,max:120},
+  {id:'fn',lbl:'Fn',dir:[0,-1],col:'#34d399',def:50,min:5,max:120},
+  {id:'ft',lbl:'Ftrap',dir:[1,0],col:'#60c5ff',def:40,min:5,max:100},
+  {id:'fw',lbl:'Fw',dir:[-1,0],col:'#fbbf24',def:40,min:5,max:100},
+  {id:'fh',lbl:'Fhand',dir:[0,1],col:'#f472b6',def:20,min:5,max:80},
+  {id:'fto',lbl:'Ftouw',dir:[0,-1],col:'#b89bff',def:20,min:5,max:80},
+];
+let fbdOn={fz:true,fn:true},fbdV={};
+FLIST.forEach(f=>fbdV[f.id]=f.def);
+function buildFBD(){
+  document.getElementById('fbd-btns').innerHTML=FLIST.map(f=>`
+    <button class="ftog ${fbdOn[f.id]?'on':''}" id="ftb-${f.id}" onclick="fbdTog('${f.id}')"
+      style="${fbdOn[f.id]?'border-color:'+f.col+';color:'+f.col:''}">
+      <span class="fd" style="background:${fbdOn[f.id]?f.col:'#3a3848'}"></span>${f.lbl}
+    </button>`).join('');
+  document.getElementById('fbd-sliders').innerHTML=FLIST.filter(f=>fbdOn[f.id]).map(f=>`
+    <div class="ctrl">
+      <label style="color:${f.col};font-family:var(--mono);font-size:9px;font-weight:500;min-width:60px">${f.lbl}</label>
+      <input type="range" min="${f.min}" max="${f.max}" value="${fbdV[f.id]}" step="1"
+        oninput="fbdV['${f.id}']=+this.value;document.getElementById('fv-${f.id}').textContent=this.value+' N';drawFBD()">
+      <span class="val" id="fv-${f.id}">${fbdV[f.id]} N</span>
+    </div>`).join('');
+}
+function fbdTog(id){fbdOn[id]=!fbdOn[id];buildFBD();drawFBD();}
+function drawFBD(){
+  const {ctx,W,H}=setupCanvas('cv-fbd',270);
+  ctx.fillStyle='#1a1a1f'; ctx.fillRect(0,0,W,H);
+  const cx=W/2,cy=H/2,bw=108,bh=65;
+  rrect(ctx,cx-bw/2,cy-bh/2,bw,bh,8,'#09192e','#60c5ff',1.5);
+  txt(ctx,'voorwerp',cx,cy+5,'#7eb5f0','500 12px Outfit');
+  const active=FLIST.filter(f=>fbdOn[f.id]);
+  const mMax=Math.max(...active.map(f=>fbdV[f.id]),1);
+  const sc=60/mMax;
+  let su=0,sd=0,sr=0,sl=0;
+  active.forEach(f=>{
+    const mag=fbdV[f.id],len=Math.max(8,mag*sc);
+    const [dx,dy]=f.dir;
+    const sx=cx+dx*(bw/2+5),sy=cy+dy*(bh/2+5);
+    arrow(ctx,sx,sy,sx+dx*len,sy+dy*len,f.col,3);
+    txt(ctx,f.lbl+'='+mag+'N',sx+dx*(len+16),sy+dy*(len+16),f.col,'bold 9px DM Mono');
+    if(dy<0)su+=mag;if(dy>0)sd+=mag;if(dx>0)sr+=mag;if(dx<0)sl+=mag;
+  });
+  const fv=Math.round((su-sd)*10)/10,fh=Math.round((sr-sl)*10)/10;
+  const ft=Math.round(Math.sqrt(fv*fv+fh*fh)*10)/10;
+  const ins=document.getElementById('fbd-ins');
+  if(ft===0){ins.className='insight ins-ok';ins.textContent='Fres = 0 N — krachtenevenwicht!';}
+  else{ins.className='insight ins-info';ins.innerHTML='Fres = '+ft.toFixed(1).replace('.',',')+' N | v: '+Math.abs(fv).toFixed(1)+'N '+(fv>0?'↑':'↓')+' | h: '+Math.abs(fh).toFixed(1)+'N '+(fh>0?'→':'←');}
+}
+
+/* ══ QUIZ DATA ══ */
+const EASY=[
+  {id:1,par:'4.1',topic:'Gevolgen kracht',q:'Miep duwt Truus op rolschaatsen vooruit. Wat is het gevolg?',opts:['Vormverandering','Snelheidstoename','Snelheidsafname','Krachtenevenwicht'],ans:1,fb:'De duw brengt Truus in beweging — snelheidstoename van 0 m/s.'},
+  {id:2,par:'4.1',topic:'Vectorgrootheid',q:'Is kracht een vectorgrootheid?',opts:['Nee — alleen grootte','Ja — grootte én richting','Alleen bij grote krachten','Alleen bij beweging'],ans:1,fb:'Kracht heeft grootte én richting. Dat maakt het een vectorgrootheid.'},
+  {id:3,par:'4.1',topic:'Vormverandering',q:'Je knijpt een blikje in. Welk gevolg heeft de kracht?',opts:['Snelheidsverandering','Richtingsverandering','Vormverandering','Krachtenevenwicht'],ans:2,fb:'Het blikje verandert van vorm — dit is een vormverandering.'},
+  {id:4,par:'4.1',topic:'Aangrijpingspunt',q:'Je wil een kast kantelen. Op welke hoogte duw je het beste?',opts:['Zo laag mogelijk','Precies midden','Zo hoog mogelijk','Maakt niet uit'],ans:2,fb:'Hoe hoger het aangrijpingspunt, hoe effectiever de kanteling.'},
+  {id:5,par:'4.2',topic:'Fres berekenen',q:'Op een voorwerp werkt 40 N rechts en 25 N links. Fres = ?',opts:['65 N rechts','15 N links','15 N rechts','40 N rechts'],ans:2,fb:'Fres = 40 − 25 = 15 N naar rechts.'},
+  {id:6,par:'4.2',topic:'Krachtenevenwicht',q:'Fres = 0 N. Wat doet het voorwerp?',opts:['Staat altijd stil','Versnelt','Stil of constante snelheid','Vertraagt'],ans:2,fb:'Fres = 0 → krachtenevenwicht → stilstand of constante snelheid.'},
+  {id:7,par:'4.2',topic:'Reactiekrachten',q:'Ftafel op boek = 12 N omhoog. Hoe groot is Fboek op tafel?',opts:['0 N','12 N omhoog','12 N omlaag','Hangt af van massa'],ans:2,fb:'Reactiekracht: even groot, tegengesteld gericht. 12 N omlaag.'},
+  {id:8,par:'4.3',topic:'Fz berekenen',q:'Object 2 kg op aarde. Fz = ?',opts:['2 N','9,81 N','19,62 N','4,9 N'],ans:2,fb:'Fz = 9,81 × 2 = 19,62 N.'},
+  {id:9,par:'4.3',topic:'Gewicht',q:'Boek valt van tafel. Hoe groot is het gewicht?',opts:['Gelijk aan Fz','0 N','Groter dan Fz','Helft van Fz'],ans:1,fb:'Gewicht = kracht op ondersteunend vlak. Bij vrije val is er geen vlak → gewicht = 0 N.'},
+  {id:10,par:'4.2',topic:'Normaalkracht',q:'Kist (3 kg) staat stil op vloer. Fn = ?',opts:['3 N','9,81 N','29,43 N','0 N'],ans:2,fb:'Fn = Fz = 9,81 × 3 = 29,43 N. Stilstand → Fn = Fz.'},
+  {id:11,par:'4.1',topic:'Richtingsverandering',q:'Bal rolt door gebogen goot. Welk gevolg heeft de kracht?',opts:['Snelheidstoename','Snelheidsafname','Richtingsverandering','Vormverandering'],ans:2,fb:'De snelheid verandert niet in grootte, maar wel in richting.'},
+  {id:12,par:'4.2',topic:'Wrijving',q:'Fré (70 N) en Oenka (80 N) trekken een kist met constante snelheid. Wrijvingskracht?',opts:['70 N','80 N','10 N','150 N'],ans:3,fb:'Constante snelheid → Fres = 0. Wrijving = 70 + 80 = 150 N.'},
+  {id:13,par:'4.3',topic:'Massa constant',q:'Je massa op aarde is 60 kg. Op de maan?',opts:['10 kg','60 kg','360 kg','9,97 kg'],ans:1,fb:'Massa verandert nooit — op maan, aarde of in de ruimte.'},
+];
+
+const HARD=[
+  {id:1,par:'4.1',topic:'Constante snelheid',q:'Klytemnestra fietst met constante snelheid en trapt. Fres = ?',opts:['Gelijk aan trapkracht','0 N — trapkracht heft wrijving op','Groter dan 0 N want ze beweegt','Gelijk aan luchtwrijving'],ans:1,fb:'Constante snelheid = Fres = 0 N. Trapkracht en alle wrijvingen heffen elkaar op.'},
+  {id:2,par:'4.1',topic:'Wrijving',q:'Klytemnestra stopt met trappen en vertraagt. Waarom klopt "er werkt geen kracht" niet?',opts:['Het klopt wel','Zwaartekracht remt','Lucht- en wegwrijving remmen','Ze heeft spierkracht'],ans:2,fb:'Lucht- en wegwrijving blijven werken.'},
+  {id:3,par:'4.2',topic:'Normaalkracht+',q:'Kist (5 kg) op vloer. Hand duwt 20 N omlaag. Fn = ?',sub:'Fz = 9,81 × 5',opts:['20 N','49,1 N','69,1 N','29,1 N'],ans:2,fb:'Fz = 49,1 N. Fn = Fz + Fhand = 49,1 + 20 = 69,1 N.'},
+  {id:4,par:'4.2',topic:'Ruimte',q:'Ruimteschip 850 km/h, geen wrijving. Hoe bereik je 1000 km/h en houd je die vast?',opts:['Motor altijd aan','Motor kort aan, daarna uit','Motor op 50%','Motor aan tot 1000, halveren'],ans:1,fb:'Geen wrijving → eenmaal op snelheid is Fres = 0. Motor uit!'},
+  {id:5,par:'4.2',topic:'Reactiekrachten',q:'Waarom heffen Ftafel op boek en Fboek op tafel elkaar niet op?',opts:['Niet even groot','Werken op verschillende voorwerpen','Zelfde richting','Tafel is zwaarder'],ans:1,fb:'Je telt alleen krachten op hetzelfde voorwerp. Deze twee staan in aparte balansen.'},
+  {id:6,par:'4.3',topic:'Weegschaal maan',q:'Weegschaal: 60 kg op aarde. Op de maan (g=1,62)?',sub:'Weegschaal = Fn / 9,81',opts:['60 kg','10 kg','9,9 kg','360 kg'],ans:2,fb:'Fn = 1,62 × 60 = 97,2 N. 97,2/9,81 ≈ 9,9 kg. Weegschaal klopt niet op de maan.'},
+  {id:7,par:'4.3',topic:'Vrije val',q:'Steen op hoogste punt, v = 0. Welke uitspraak klopt?',opts:['Fres = 0 want stil','Geen kracht','Fz werkt — versnelt omlaag','Krachtenevenwicht want v=0'],ans:2,fb:'Stilstand ≠ krachtenevenwicht. Fz werkt altijd.'},
+  {id:8,par:'4.2',topic:'Normaalkracht−',q:'Boek (1 kg) op tafel. Touw trekt 5 N omhoog. Fn = ?',sub:'Fz = 9,81',opts:['9,81 N','14,81 N','4,81 N','5 N'],ans:2,fb:'Fn = Fz − Ftouw = 9,81 − 5 = 4,81 N.'},
+  {id:9,par:'4.3',topic:'Massa definitie',q:'Beste definitie van massa?',opts:['Kracht waarmee aarde trekt','Weerstand tegen snelheidsverandering','Gewicht in kg','Materie × zwaartekracht'],ans:1,fb:'Massa is weerstand tegen snelheidsverandering. Onafhankelijk van locatie.'},
+  {id:10,par:'4.2',topic:'Fres → versnelling',q:'Stilstaand voorwerp (2 kg), Fres = 6 N. Wat gebeurt er?',opts:['Blijft stil','Constante snelheid 3 m/s','Versnelt in richting kracht','Fres = 0 want stil'],ans:2,fb:'Fres ≠ 0 → versnelling. Het voorwerp komt in beweging.'},
+  {id:11,par:'4.1',topic:'Resulterende kracht',q:'Persi: "hoe groter de kracht, hoe groter de snelheidsverandering." Wat klopt niet?',opts:['Kracht veroorzaakt nooit snelheidsverandering','Je moet "resulterende kracht" zeggen','Eenheid is geen N','Snelheid hangt niet af van kracht'],ans:1,fb:'Je moet "resulterende kracht" zeggen. Andere krachten kunnen compenseren.'},
+  {id:12,par:'4.2',topic:'Lift',q:'In lift die omlaag versnelt. Weegschaal?',opts:['Meer dan echte massa','Precies je massa','Minder dan echte massa','0 kg'],ans:2,fb:'Fres omlaag → Fn < Fz → weegschaal geeft minder aan.'},
+  {id:13,par:'4.3',topic:'Gewichtloosheid',q:'Astronaut in ISS. Wat over zwaartekracht?',opts:['Geen zwaartekracht','Fz = 0 op 400 km','ISS valt continu — astronaut heeft geen contact met vloer','Te ver van aarde'],ans:2,fb:'ISS valt in baan om aarde. Astronaut valt mee → gewicht = 0. Fz werkt wel.'},
+];
+
+const REP=[
+  {id:1,par:'4.2',topic:'Normaalkracht lift',q:'Meisje (40 kg) in lift omhoog versnellend. Weegschaal?',sub:null,opts:['Precies 40 kg','Minder dan 40 kg','Meer dan 40 kg','0 kg'],ans:2,fb:'Fres omhoog → Fn > Fz → weegschaal geeft meer dan 40 kg.'},
+  {id:2,par:'4.2',topic:'Reactiekracht muur',q:'Je duwt 80 N tegen een muur. Kracht van muur op jou?',sub:null,opts:['0 N','Minder dan 80 N','80 N terug','Meer dan 80 N'],ans:2,fb:'Reactiekracht: even groot (80 N), tegengesteld.'},
+  {id:3,par:'4.3',topic:'Massa vs gewicht',q:'Pak suiker weegt op maan minder. Wat veranderde?',sub:null,opts:['Massa is kleiner','Gewicht kleiner, massa niet','Allebei kleiner','Niets'],ans:1,fb:'Op maan is g kleiner → Fz kleiner → gewicht kleiner. Massa nooit.'},
+  {id:4,par:'4.2',topic:'Auto constante snelheid',q:'Auto 120 km/h constante snelheid. Fres = ?',sub:null,opts:['Gelijk aan motorkracht','0 N','Groter want snel','Gelijk aan luchtweerstand'],ans:1,fb:'Constante snelheid = Fres = 0 N.'},
+  {id:5,par:'4.2',topic:'Normaalkracht touw',q:'Boek (2 kg) op tafel. Touw trekt 10 N omhoog. Fn = ?',sub:'Fz = 9,81 × 2',opts:['19,62 N','9,62 N','29,62 N','10 N'],ans:1,fb:'Fn = Fz − Ftouw = 19,62 − 10 = 9,62 N.'},
+  {id:6,par:'4.1',topic:'Geen wrijving',q:'Bal rolt zonder wrijving. Welke kracht nodig om hem op snelheid te houden?',sub:null,opts:['Constante kracht vooruit','0 N','Kracht = massa','Hangt af van snelheid'],ans:1,fb:'Geen wrijving → Fres = 0 al bij nul kracht. Bal blijft vanzelf op snelheid.'},
+  {id:7,par:'4.3',topic:'Mars',q:'Op Mars g = 3,72. Object weegt op aarde 98,1 N. Op Mars?',sub:'Massa = Fz/g',opts:['98,1 N','37,2 N','264 N','9,81 N'],ans:1,fb:'Massa = 98,1/9,81 = 10 kg. Op Mars: Fz = 3,72 × 10 = 37,2 N.'},
+  {id:8,par:'4.2',topic:'Fres omlaag',q:'30 N omhoog en 50 N omlaag op voorwerp. Fres = ?',sub:null,opts:['80 N omhoog','20 N omhoog','20 N omlaag','80 N omlaag'],ans:2,fb:'Fres = 50 − 30 = 20 N omlaag.'},
+];
+
+let qMode='easy', qAns={};
+function setQuiz(m){
+  qMode=m;
+  ['easy','hard','rep'].forEach(x=>document.getElementById('qt-'+x).classList.toggle('active',x===m));
+  qAns={};buildQuiz();
+}
+function getQ(){return qMode==='easy'?EASY:qMode==='hard'?HARD:REP;}
+function buildQuiz(){
+  const qs=getQ();
+  document.getElementById('q-container').innerHTML=qs.map(q=>`
+    <div class="qcard" id="qc-${q.id}">
+      <div class="qmeta">vraag ${q.id} · §${q.par} <span class="qtag" style="background:rgba(96,197,255,.1);color:var(--nat)">${q.topic}</span></div>
+      <p class="qtext">${q.q}</p>
+      ${q.sub?`<div class="qsub">${q.sub}</div>`:''}
+      <div class="opts" id="qo-${q.id}">
+        ${q.opts.map((o,i)=>`<button class="opt" onclick="doAns(${q.id},${i})">${o}</button>`).join('')}
+      </div>
+      <div class="feedback" id="qf-${q.id}"></div>
+    </div>`).join('');
+  updateScore(qs);
+}
+function doAns(qid,chosen){
+  if(qAns[qid]!==undefined)return;
+  const qs=getQ(),q=qs.find(x=>x.id===qid);
+  qAns[qid]=chosen;
+  document.querySelectorAll(`#qo-${qid} .opt`).forEach((b,i)=>{
+    b.disabled=true;
+    if(i===q.ans)b.classList.add(chosen===q.ans?'correct':'reveal');
+    if(i===chosen&&chosen!==q.ans)b.classList.add('wrong');
+  });
+  const fb=document.getElementById('qf-'+qid);
+  fb.className='feedback show '+(chosen===q.ans?'fb-ok':'fb-err');
+  fb.textContent=(chosen===q.ans?'✓ Goed! ':'✗ Niet helemaal. ')+q.fb;
+  updateScore(qs);
+  updateProgress();
+}
+function updateScore(qs){
+  const tot=Object.keys(qAns).length;
+  const ok=Object.entries(qAns).filter(([id,c])=>{const q=qs.find(x=>x.id===+id);return q&&c===q.ans;}).length;
+  document.getElementById('q-ok').textContent=ok;
+  document.getElementById('q-tot').textContent=qs.length;
+  document.getElementById('q-prog').innerHTML=qs.map(q=>{
+    let c='pd';if(qAns[q.id]!==undefined)c+=(qAns[q.id]===q.ans?' ok':' err');
+    return`<div class="${c}"></div>`;
+  }).join('');
+  const rem=qs.length-tot;
+  if(tot===0)document.getElementById('q-msg').textContent='Beantwoord de vragen.';
+  else if(rem>0)document.getElementById('q-msg').textContent=rem+' vraag'+(rem===1?'':'en')+' te gaan.';
+  else{const p=Math.round(ok/qs.length*100);document.getElementById('q-msg').textContent=(p>=80?'Uitstekend!':p>=60?'Goed bezig!':'Nog even herhalen. ')+ok+'/'+qs.length+' ('+p+'%)';}
+}
+function resetQ(){qAns={};buildQuiz();}
+
+/* ══ PROGRESS ══ */
+function updateProgress(){
+  const allQ=[...EASY,...HARD,...REP];
+  const done=Object.keys(qAns).length;
+  const total=allQ.length;
+  const pct=Math.min(100,Math.round(done/total*100));
+  document.getElementById('prog-fill').style.width=pct+'%';
+  document.getElementById('prog-pct').textContent=pct+'%';
+  document.getElementById('dash-nat-bar').style.width=pct+'%';
+  document.getElementById('dash-nat-pct').textContent=pct+'%';
+}
+
+/* ══ EXTRA PAGES ══ */
+const YT_DATA = [
+  {
+    name: 'Math with Menno',
+    url: 'https://www.youtube.com/@MathwithMenno',
+    desc: 'Duidelijke uitleg over wiskunde voor middelbare school en hoger. Stap-voor-stap uitgewerkte opgaven met heldere voorbeelden.',
+    tags: ['Wiskunde', 'Middelbare school', 'Gratis'],
+    color: '#ff4444',
+    icon: '📐',
+    thumb: 'https://yt3.googleusercontent.com/ytc/AIdro_lGHFqsJBbbKrqrH1VwQ3aEhCoUHcSTSIJEnfR0NkF0gw=s88-c-k-c0x00ffffff-no-rj'
+  }
+];
+
+const WEB_DATA = [
+  {
+    name: 'StudyGo',
+    url: 'https://studygo.com/nl/learn/recent',
+    desc: 'Leer met flashcards, samenvattingen en oefentoetsen. Grote bibliotheek aan leermateriaal voor alle vakken en niveaus.',
+    tags: ['Flashcards', 'Samenvattingen', 'Alle vakken'],
+    color: '#a78bfa',
+    icon: '📚'
+  }
+];
+
+function openExtra(type, btn) {
+  document.querySelectorAll('.subject-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('topbar-tabs').style.display = 'none';
+
+  if (type === 'yt') {
+    document.getElementById('topbar-title').textContent = 'YouTube kanalen';
+    showPageDirect('yt');
+    buildResGrid('yt-grid', YT_DATA, '#ff4444');
+  } else {
+    document.getElementById('topbar-title').textContent = 'Handige websites';
+    showPageDirect('web');
+    buildResGrid('web-grid', WEB_DATA, '#a78bfa');
+  }
+}
+
+function buildResGrid(containerId, data, defaultColor) {
+  document.getElementById(containerId).innerHTML = data.map(r => {
+    const col = r.color || defaultColor;
+    const thumbHtml = r.thumb
+      ? `<img src="${r.thumb}" alt="${r.name}" onerror="this.parentElement.innerHTML='${r.icon}'">`
+      : r.icon;
+    return `<a class="res-card" href="${r.url}" target="_blank" rel="noopener" style="--rc:${col}">
+      <div class="res-thumb">${thumbHtml}</div>
+      <div class="res-info">
+        <div class="res-label" style="color:${col}">${r.url.includes('youtube') ? 'YouTube kanaal' : 'Website'}</div>
+        <div class="res-name">${r.name}</div>
+        <div class="res-desc">${r.desc}</div>
+        <div class="res-tags">
+          ${r.tags.map(t => `<span class="res-tag" style="background:${col}22;color:${col}">${t}</span>`).join('')}
+        </div>
+        <span class="res-link">
+          Bezoeken
+          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 6h8M7 3l3 3-3 3"/>
+          </svg>
+        </span>
+      </div>
+    </a>`;
+  }).join('');
+}
+
+/* ══ INIT ══ */
+buildFBD();
+window.addEventListener('resize',()=>{
+  if(document.getElementById('pg-widgets').classList.contains('active')){
+    wRes();drawRK();drawPlanets();drawVec();drawFBD();
+  }
+});
+</script>
+</body>
+</html>
